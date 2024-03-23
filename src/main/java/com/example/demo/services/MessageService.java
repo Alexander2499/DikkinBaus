@@ -18,10 +18,11 @@ public class MessageService {
     }
 
     public List<Message> saveMessage(String content, Long user1, Long user2) {
-        List<Message> message = messageRepository.getDialog(user1, user2);
-
-
-
+        List<Message> messageList = messageRepository.getDialog(user1, user2);
+        Message message = new Message();
+        message.setContent(content);
+        messageList.add(message);
+        return messageList;
     }
 
 }

@@ -39,6 +39,9 @@ class UserControllerTest {
     private MessageRepository messageRepository;
 
 
+
+
+
     @BeforeEach
     void setUp() {
         User admin = new User();
@@ -70,7 +73,7 @@ class UserControllerTest {
         friend1.setUser2(user1.getId());
         friendRepository.save(friend1);
 
-        messageRepository.
+
 
         this.mockMvc.perform(get("/user/showMessages/" + user1.getId()))
                 .andDo(print())

@@ -35,6 +35,13 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
+    @GetMapping("/saveMessages/{friendId}")
+    public ResponseEntity<List<Message>> saveMessage(@PathVariable Long friendId, String content) {
+        User user1 = userService.getCurrentUser();
+        List<Message> message = messageService.saveMessage(content,user1.getId(), friendId);
+        return ResponseEntity.ok(message);
+    }
+
     @GetMapping("/showMessages/{friendId}")
     public ResponseEntity<List<Message>> showMessage(@PathVariable Long friendId) {
         User user1 = userService.getCurrentUser();
@@ -43,12 +50,14 @@ public class UserController {
     }
 
 
+
     @GetMapping("/showFriends")
     public ResponseEntity<List<User>> showFriends() {
         User user = userService.getCurrentUser();
         List<User> friends = userService.friendsOf(user.getId());
         return ResponseEntity.ok(friends);
     }
+
 
 //    @GetMapping("/addFriend")
 //    public Friend addFriend(Long user2) {
