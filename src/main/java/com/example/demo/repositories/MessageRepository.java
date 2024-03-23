@@ -23,4 +23,6 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     @Query("DELETE FROM Message m WHERE m.dialogId = :dialogId ")
     void deleteDialog(@Param("dialogId") Long dialogId);
 
+
+
 }

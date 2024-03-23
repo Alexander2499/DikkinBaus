@@ -5,19 +5,17 @@ import com.example.demo.model.Message;
 import com.example.demo.model.User;
 import com.example.demo.repositories.FriendRepository;
 import com.example.demo.repositories.MessageRepository;
-import com.example.demo.repositories.UserRepository;
+import com.example.demo.services.FriendService;
+import com.example.demo.services.MessageService;
+import com.example.demo.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -25,88 +23,62 @@ import java.util.List;
 public class UserController {
 
     @Autowired
-    private UserRepository userRepository;
+    private UserService userService;
 
     @Autowired
-    private FriendRepository friendRepository;
-
-    @Autowired
-    private MessageRepository messageRepository;
+    private MessageService messageService;
 
 
     @GetMapping("/showUser")
-    public User showUser() {
-        String login = currentUserLogin();
-        return userRepository.findByLogin(login);
+    public ResponseEntity<User> showUser() {
+        User user = userService.getCurrentUser();
+        return ResponseEntity.ok(user);
     }
 
-    @GetMapping("/showMessage")
-    public String showMessage(@PathVariable("id") Long id) {
-
-        return "message";
+    @GetMapping("/showMessages/{friendId}")
+    public ResponseEntity<List<Message>> showMessage(@PathVariable Long friendId) {
+        User user1 = userService.getCurrentUser();
+        List<Message> message = messageService.getDialog(user1.getId(), friendId);
+        return ResponseEntity.ok(message);
     }
 
-    @GetMapping
-    public Message sendMessage(String text, Long senderId) {
-        Message message = new Message();
-        message.setContent(text);
-        message.setDialogId(senderId);
-        message.getMessageDate(LocalDate.now());
-        return messageRepository.save(message);
-    }
-
-    @GetMapping
-    public void deleteMessage() {
-//        messageRepository.deleteById();
-    }
 
     @GetMapping("/showFriends")
-    public List<User> showFriends() {
-        String login = currentUserLogin();
-        User user = userRepository.findByLogin(login);
-        return userRepository.friendsOf(user.getId());
-//        return "friends";
+    public ResponseEntity<List<User>> showFriends() {
+        User user = userService.getCurrentUser();
+        List<User> friends = userService.friendsOf(user.getId());
+        return ResponseEntity.ok(friends);
     }
 
-    @GetMapping("/addFriend")
-    public Friend addFriend(Long user2) {
-        User user1 = showUser();
-        Friend newFriend = new Friend();
-        newFriend.setUser1(user1.getId());
-        newFriend.setUser2(user2);
-        return friendRepository.save(newFriend);
-    }
-
-    @GetMapping("/deleteFriend")
-    public Friend deleteFriend(Long user2) {
-        User user = showUser();
-        return friendRepository.deleteFriend(user.getId(),user2);
-    }
-
-
-    private String currentUserLogin() {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (principal instanceof UserDetails) {
-            return ((UserDetails) principal).getUsername();
-        } else {
-            return principal.toString();
-        }
-    }
-
-
-//    @GetMapping
-//    public String greet() {
-//        return "Hello";
+//    @GetMapping("/addFriend")
+//    public Friend addFriend(Long user2) {
+//        User user1 = showUser();
+//        Friend newFriend = new Friend();
+//        newFriend.setUser1(user1.getId());
+//        newFriend.setUser2(user2);
+//        return friendRepository.save(newFriend);
 //    }
-
-//    @Bean
-//    public DataSource dataSource() {
-//        DriverManagerDataSource dataSource = new DriverManagerDataSource();
-//        dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
-//        dataSource.setUrl("jdbc:mysql://localhost:3306/web_project");
-//        dataSource.setUsername("root");
-//        dataSource.setPassword("root");
-//        return (DataSource) dataSource;
+//
+//    @GetMapping("/deleteFriend")
+//    public Friend deleteFriend(Long user2) {
+//        User user = showUser();
+//        return friendRepository.deleteFriend(user.getId(), user2);
+//    }
+//
+//    public Message sendMessage(String text, Long senderId) {
+//        Message message = new Message();
+//        message.setContent(text);
+//        message.setDialogId(senderId);
+//        message.getMessageDate(LocalDate.now());
+//        return messageRepository.save(message);
+//    }
+//
+//    //    @GetMapping
+//    public void deleteDialog(Long id) {
+//    }
+//
+//
+//    public void deleteMessage(Long id) {
 //    }
 
 }

@@ -3,6 +3,7 @@ package com.example.demo.controllers;
 import com.example.demo.model.Friend;
 import com.example.demo.model.User;
 import com.example.demo.repositories.FriendRepository;
+import com.example.demo.repositories.MessageRepository;
 import com.example.demo.repositories.UserRepository;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,6 +35,10 @@ class UserControllerTest {
     @Autowired
     private FriendRepository friendRepository;
 
+    @Autowired
+    private MessageRepository messageRepository;
+
+
     @BeforeEach
     void setUp() {
         User admin = new User();
@@ -53,7 +58,26 @@ class UserControllerTest {
     }
 
     @Test
-    void showMessage() {
+    void showMessage() throws Exception {
+        User admin = userRepository.findByLogin("admin");
+
+        User user1 = new User();
+        user1.setLogin("user1");
+        userRepository.save(user1);
+
+        Friend friend1 = new Friend();
+        friend1.setUser1(admin.getId());
+        friend1.setUser2(user1.getId());
+        friendRepository.save(friend1);
+
+        messageRepository.
+
+        this.mockMvc.perform(get("/user/showMessages/" + user1.getId()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$.[0].login").value("user1"));
+
     }
 
     @Test
