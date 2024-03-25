@@ -11,11 +11,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultMatcher;
 
+import static net.bytebuddy.matcher.ElementMatchers.is;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -60,8 +64,11 @@ class UserControllerTest {
 //                .andExpect(content().string(containsString("user")));
     }
 
+
+
     @Test
-    void showMessage() throws Exception {
+    public void testSaveMessage() throws Exception {
+
         User admin = userRepository.findByLogin("admin");
 
         User user1 = new User();
@@ -73,15 +80,51 @@ class UserControllerTest {
         friend1.setUser2(user1.getId());
         friendRepository.save(friend1);
 
+        String content = "Лава Украине!";
 
-
-        this.mockMvc.perform(get("/user/showMessages/" + user1.getId()))
+        this.mockMvc.perform(post("/user/saveMessage/" + user1.getId())
+                        .content(content)
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$.[0].login").value("user1"));
-
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect((ResultMatcher) jsonPath("$[0].content", is(content)));
     }
+
+
+//    @Test
+//    void showMessage() throws Exception {
+//        User admin = userRepository.findByLogin("admin");
+//
+//        User user1 = new User();
+//        user1.setLogin("user1");
+//        userRepository.save(user1);
+//
+//        Friend friend1 = new Friend();
+//        friend1.setUser1(admin.getId());
+//        friend1.setUser2(user1.getId());
+//        friendRepository.save(friend1);
+//
+//
+//
+//        this.mockMvc.perform(post("/user/saveMessage/" + user1.getId() + "/" + "Лава Украине!"))
+//                .andDo(print())
+//                .andExpect(status().isOk())
+//                .andExpect(jsonPath("$",hasSize(1)))
+//                .andExpect(jsonPath("$[0]."));
+
+
+
+
+
+
+//        this.mockMvc.perform(get("/user/showMessages/" + user1.getId()))
+//                .andDo(print())
+//                .andExpect(status().isOk())
+//                .andExpect(jsonPath("$", hasSize(1)))
+//                .andExpect(jsonPath("$.[0].").value("user1"));
+
+//    }
 
     @Test
     void showFriends() throws Exception {

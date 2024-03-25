@@ -10,10 +10,7 @@ import com.example.demo.services.MessageService;
 import com.example.demo.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -35,14 +32,14 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
-    @GetMapping("/saveMessages/{friendId}")
-    public ResponseEntity<List<Message>> saveMessage(@PathVariable Long friendId, String content) {
+    @PostMapping("/saveMessage/{friendId}/{content}")
+    public ResponseEntity<List<Message>> saveMessage(@PathVariable Long friendId, @RequestBody String content) {
         User user1 = userService.getCurrentUser();
         List<Message> message = messageService.saveMessage(content,user1.getId(), friendId);
         return ResponseEntity.ok(message);
     }
 
-    @GetMapping("/showMessages/{friendId}")
+    @GetMapping("/showMessages/{friendId}}")
     public ResponseEntity<List<Message>> showMessage(@PathVariable Long friendId) {
         User user1 = userService.getCurrentUser();
         List<Message> message = messageService.getDialog(user1.getId(), friendId);
